@@ -1,6 +1,6 @@
 # docker-security-checker
 
-This repository contains OPA Rego policies for `Dockerfile` Security linting using Conftest
+This repository contains OPA Rego policies for `Dockerfile` Security checks using Conftest
 
 * The rego policy rules can be found at [policy/security.rego](policy/security.rego)
 

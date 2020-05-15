@@ -1,4 +1,4 @@
-# docker-security-linter
+# docker-security-checker
 
 This repository contains OPA Rego policies for `Dockerfile` Security linting using Conftest
 

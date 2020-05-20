@@ -11,8 +11,10 @@ suspicious_env_keys = [
     "token",
 ]
 
-apk_commands = [
+pkg_update_commands = [
     "apk upgrade",
+    "apt-get upgrade",
+    "dist-upgrade",
 ]
 
 image_tag_list = [
@@ -33,7 +35,7 @@ warn[msg] {
     input[i].Cmd == "from"
     val := split(input[i].Value[0], ":")
     count(val) == 1
-    msg := sprintf("Do not use latest tag with image: %s", [val])
+    msg = sprintf("Do not use latest tag with image: %s", [val])
 }
 
 # Looking for latest docker image used
@@ -48,8 +50,8 @@ warn[msg] {
 deny[msg] {
     input[i].Cmd == "run"
     val := concat(" ", input[i].Value)
-    contains(val, apk_commands[_])
-    msg = sprintf("Do not use apk upgrade: %s", [val])
+    contains(val, pkg_update_commands[_])
+    msg = sprintf("Do not use upgrade commands: %s", [val])
 }
 
 # Looking for ADD command instead using COPY command
@@ -58,3 +60,17 @@ deny[msg] {
     val := concat(" ", input[i].Value)
     msg = sprintf("Use COPY instead of ADD: %s", [val])
 }
+
+# sudo usage
+deny[msg] {
+    input[i].Cmd == "run"
+    val := concat(" ", input[i].Value)
+    contains(lower(val), "sudo")
+    msg = sprintf("Avoid using 'sudo' command: %s", [val])
+}
+
+# # No Healthcheck usage
+# deny[msg] {
+#     input[i].Cmd == "healthcheck"
+#     msg := "no healthcheck"
+# }

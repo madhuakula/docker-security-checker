@@ -9,6 +9,7 @@ WORKDIR /app
 ADD app /app
 COPY README.md /app/README.md
 ADD code /tmp/code
+RUN sudo apt-get udpate
 
 RUN apt-get update && apt-get install -y htop
 

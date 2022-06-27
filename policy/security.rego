@@ -22,12 +22,42 @@ image_tag_list = [
     "LATEST",
 ]
 
-# Looking for suspicious environemnt variables
+# Looking for suspicious environment variable settings
 deny[msg] {    
-    input[i].Cmd == "env"
-    val := input[i].Value
-    contains(lower(val[_]), suspicious_env_keys[_])
-    msg = sprintf("Suspicious ENV key found: %s", [val])
+    dockerenvs := [val | input[i].Cmd == "env"; val := input[i].Value]
+    dockerenv := dockerenvs[_]
+    envvar := dockerenv[_]
+    lower(envvar) == suspicious_env_keys[_]
+    msg = sprintf("Potential secret in ENV found: %s", [envvar])
+}
+
+# Looking for suspicious environment variable settings
+deny[msg] {
+    dockerenvs := [val | input[i].Cmd == "env"; val := input[i].Value]
+    dockerenv := dockerenvs[_]
+    envvar := dockerenv[_]
+    startswith(lower(envvar), suspicious_env_keys[_])
+    msg = sprintf("Potential secret in ENV found: %s", [envvar])
+}
+
+# Looking for suspicious environment variable settings
+deny[msg] {
+    dockerenvs := [val | input[i].Cmd == "env"; val := input[i].Value]
+    dockerenv := dockerenvs[_]
+    envvar := dockerenv[_]
+    endswith(lower(envvar), suspicious_env_keys[_])
+    msg = sprintf("Potential secret in ENV found: %s", [envvar])
+}
+
+# Looking for suspicious environment variable settings
+deny[msg] {
+    dockerenvs := [val | input[i].Cmd == "env"; val := input[i].Value]
+    dockerenv := dockerenvs[_]
+    envvar := dockerenv[_]
+    parts := regex.split("[ :=_-]", envvar)
+    part := parts[_]
+    lower(part) == suspicious_env_keys[_]
+    msg = sprintf("Potential secret in ENV found: %s", [envvar])
 }
 
 # Looking for latest docker image used
